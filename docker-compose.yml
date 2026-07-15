@@ -1,0 +1,24 @@
+services:
+  vision-mcp:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      API_KEYS: ${API_KEYS}
+      API_BASE_URL: ${API_BASE_URL:-https://maas-coding-api.cn-huabei-1.xf-yun.com/anthropic}
+      MODEL_ID: ${MODEL_ID:-xopkimik26}
+      MAX_CONCURRENCY: ${MAX_CONCURRENCY:-100}
+      PER_KEY_CONCURRENCY: ${PER_KEY_CONCURRENCY:-20}
+      MAX_RETRIES: ${MAX_RETRIES:-3}
+      KEY_COOLDOWN_MS: ${KEY_COOLDOWN_MS:-60000}
+      IMAGE_MAX_SIZE_MB: ${IMAGE_MAX_SIZE_MB:-10}
+      IMAGE_MAX_DIMENSION: ${IMAGE_MAX_DIMENSION:-2048}
+      IMAGE_OCR_MAX_DIMENSION: ${IMAGE_OCR_MAX_DIMENSION:-4096}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
