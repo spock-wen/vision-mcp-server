@@ -1,0 +1,8 @@
+node_modules/
+build/
+dist/
+.omc/
+test/
+*.log
+.env
+package-lock.json
