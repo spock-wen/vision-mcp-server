@@ -58,3 +58,11 @@ export async function runDoubleImageTool(args: {
     return result.text;
   });
 }
+
+export async function toolText(fn: () => Promise<string>): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: boolean }> {
+  try {
+    return { content: [{ type: 'text' as const, text: await fn() }] };
+  } catch (e) {
+    return { content: [{ type: 'text' as const, text: e instanceof Error ? e.message : '工具执行失败' }], isError: true };
+  }
+}

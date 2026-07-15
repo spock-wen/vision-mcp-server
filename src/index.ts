@@ -3,6 +3,7 @@ import { loadConfig } from './config.js';
 import { createLogger } from './utils/logger.js';
 import { createVisionServer } from './server.js';
 import { createHealthHandler } from './health.js';
+import { bodyAccumulator } from './body-limit.js';
 
 async function main(): Promise<void> {
   const cfg = loadConfig();
@@ -16,13 +17,23 @@ async function main(): Promise<void> {
       health(res);
       return;
     }
-    if (req.url === '/mcp' || req.url?.startsWith('/mcp')) {
+    if (req.url === '/mcp' || req.url?.startsWith('/mcp/') || req.url?.startsWith('/mcp?')) {
       // Body parsing for POST
       if (req.method === 'POST' || req.method === 'PUT') {
-        const chunks: Buffer[] = [];
-        req.on('data', (c: Buffer) => chunks.push(c));
+        const acc = bodyAccumulator();
+        let tooLarge = false;
+        req.on('data', (c: Buffer) => {
+          if (tooLarge) return;
+          if (!acc.push(c)) {
+            tooLarge = true;
+            if (!res.headersSent) { res.statusCode = 413; res.end('Payload Too Large'); }
+            req.destroy();
+            return;
+          }
+        });
         req.on('end', () => {
-          const raw = Buffer.concat(chunks).toString('utf8');
+          if (tooLarge) return;
+          const raw = Buffer.concat(acc.chunks).toString('utf8');
           let parsed: unknown = undefined;
           try { parsed = raw.length ? JSON.parse(raw) : undefined; } catch { parsed = raw; }
           vision.handleRequest(req, res, parsed).catch((err) => {
