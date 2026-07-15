@@ -11,6 +11,13 @@ export interface CompleteRequest {
   maxTokens?: number;
 }
 
+export interface CompleteMultiRequest {
+  system: string;
+  userText: string;
+  images: ProcessedImage[];
+  maxTokens?: number;
+}
+
 export interface CompleteResult {
   text: string;
   stopReason?: string;
@@ -28,6 +35,10 @@ export class ModelClient {
   ) {}
 
   async complete(req: CompleteRequest): Promise<CompleteResult> {
+    return this.completeMulti({ system: req.system, userText: req.userText, images: [req.image], maxTokens: req.maxTokens });
+  }
+
+  async completeMulti(req: CompleteMultiRequest): Promise<CompleteResult> {
     const url = `${this.cfg.apiBaseUrl}/v1/messages`;
     const body = {
       model: this.cfg.modelId,
@@ -37,7 +48,11 @@ export class ModelClient {
         {
           role: 'user',
           content: [
-            { type: 'image', source: { type: 'base64', media_type: req.image.mediaType, data: req.image.base64 } },
+            ...req.images.map((im, idx) => ({
+              type: 'image',
+              source: { type: 'base64', media_type: im.mediaType, data: im.base64 },
+              ...(req.images.length > 1 ? { _label: idx === 0 ? 'image_before' : 'image_after' } : {}),
+            })),
             { type: 'text', text: req.userText },
           ],
         },

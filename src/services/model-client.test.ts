@@ -97,3 +97,19 @@ test('all keys on cooldown -> AllKeysUnavailableError', async () => {
   const client = new ModelClient(baseCfg, pool, log, async () => ({}) as Response);
   await assert.rejects(() => client.complete({ system: 'sys', userText: 'q', image: img }), AllKeysUnavailableError);
 });
+
+test('completeMulti sends all images in one message', async () => {
+  const pool = new KeyPool({ keys: ['a'], perKeyConcurrency: 5, cooldownMs: 60_000 }, log);
+  let captured: unknown;
+  const fetchFn = async (_url: string, init: { body: string }) => {
+    captured = JSON.parse(init.body);
+    return { ok: true, status: 200, json: async () => ({ content: [{ type: 'text', text: 'diff' }], stop_reason: 'end_turn' }), text: async () => '' };
+  };
+  const client = new ModelClient(baseCfg, pool, log, fetchFn as unknown as typeof fetch);
+  const res = await client.completeMulti({ system: 's', userText: 'compare', images: [img, img] });
+  assert.equal(res.text, 'diff');
+  const content = (captured as { messages: Array<{ content: Array<{ type: string }> }> }).messages[0]!.content;
+  assert.equal(content[0]!.type, 'image');
+  assert.equal(content[1]!.type, 'image');
+  assert.equal(content[2]!.type, 'text');
+});
