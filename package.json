@@ -1,0 +1,28 @@
+{
+  "name": "vision-mcp-server",
+  "version": "1.0.0",
+  "description": "Remote MCP server exposing vision tools over the 讯飞 MaaS Anthropic-compatible model API",
+  "type": "module",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "start": "node build/index.js",
+    "dev": "tsx watch src/index.ts",
+    "test": "node --import tsx --test \"src/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.26.0",
+    "pino": "10.3.1",
+    "sharp": "0.35.3",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
