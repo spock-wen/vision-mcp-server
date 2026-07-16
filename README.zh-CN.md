@@ -210,10 +210,13 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
 ## 开发
 
 ```bash
-npm test          # node:test 跑 src/**/*.test.ts
+npm test          # 单元测试（node:test 跑 src/**/*.test.ts）
+npm run test:e2e  # 端到端测试（真实 API，需要 .env）
 npm run typecheck # tsc --noEmit
 npm run dev       # tsx watch src/index.ts（HTTP 模式）
 ```
+
+端到端测试需要 `.env` 文件（从 `.env.example` 复制并填入 `API_KEY`）。
 
 技术栈：TypeScript（ESM/NodeNext）、`@modelcontextprotocol/sdk`、`zod`、`sharp`、`pino`。无外部测试框架——用内置 `node:test`。
 

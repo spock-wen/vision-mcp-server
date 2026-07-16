@@ -210,10 +210,13 @@ All config is via environment variables. **Three are about your model** — the 
 ## Development
 
 ```bash
-npm test          # node:test over src/**/*.test.ts
+npm test          # unit tests (node:test over src/**/*.test.ts)
+npm run test:e2e  # e2e tests (real API, requires .env)
 npm run typecheck # tsc --noEmit
 npm run dev       # tsx watch src/index.ts (HTTP mode)
 ```
+
+E2E tests require a `.env` file (copy from `.env.example` and fill in `API_KEY`).
 
 Tech: TypeScript (ESM/NodeNext), `@modelcontextprotocol/sdk`, `zod`, `sharp`, `pino`. No external test framework — built-in `node:test`.
 
