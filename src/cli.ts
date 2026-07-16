@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * Local stdio MCP entry point.
  *
