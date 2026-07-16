@@ -81,6 +81,7 @@ export class ModelClient {
             'anthropic-version': ANTHROPIC_VERSION,
           },
           body: JSON.stringify(body),
+          signal: AbortSignal.timeout(this.cfg.modelTimeoutMs),
         });
 
         if (res.ok) {

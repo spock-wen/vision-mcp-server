@@ -1,6 +1,6 @@
 {
   "name": "@spock-wen/vision-mcp-server",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "MCP server exposing 7 vision tools (analysis, UI→code, OCR, error diagnosis, diagram, data-viz, diff) — works with any Anthropic-Messages-compatible vision model",
   "type": "module",
   "main": "build/index.js",

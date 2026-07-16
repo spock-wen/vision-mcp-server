@@ -3,8 +3,7 @@ import { ConfigError } from './utils/errors.js';
 
 const EnvSchema = z.object({
   PORT: z.string().default('3000'),
-  // Singular API_KEY is the single-user / local form; API_KEYS (comma-separated) is the
-  // multi-key form. Either is accepted; singular takes precedence when both are set.
+  // Singular API_KEY and comma-separated API_KEYS are merged when both are set.
   API_KEY: z.string().optional(),
   API_KEYS: z.string().optional(),
   API_BASE_URL: z.string().default('https://maas-coding-api.cn-huabei-1.xf-yun.com/anthropic'),
@@ -18,6 +17,8 @@ const EnvSchema = z.object({
   IMAGE_MAX_SIZE_MB: z.string().default('10'),
   IMAGE_MAX_DIMENSION: z.string().default('2048'),
   IMAGE_OCR_MAX_DIMENSION: z.string().default('4096'),
+  IMAGE_DIFF_MAX_DIMENSION: z.string().default('1536'),
+  MODEL_TIMEOUT_MS: z.string().default('30000'),
   LOG_LEVEL: z.string().default('info'),
   // Set to "0" to skip TLS certificate verification for model requests — use only for
   // intranet endpoints with self-signed certs (e.g. company gateways). Defaults to verify.
@@ -38,6 +39,8 @@ export interface AppConfig {
   imageMaxSizeBytes: number;
   imageStandardMaxDim: number;
   imageOcrMaxDim: number;
+  imageDiffMaxDim: number;
+  modelTimeoutMs: number;
   logLevel: string;
   rejectUnauthorized: boolean;
 }
@@ -78,6 +81,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     imageMaxSizeBytes: imageMaxMb * 1024 * 1024,
     imageStandardMaxDim: toInt(parsed.IMAGE_MAX_DIMENSION, 'IMAGE_MAX_DIMENSION'),
     imageOcrMaxDim: toInt(parsed.IMAGE_OCR_MAX_DIMENSION, 'IMAGE_OCR_MAX_DIMENSION'),
+    imageDiffMaxDim: toInt(parsed.IMAGE_DIFF_MAX_DIMENSION, 'IMAGE_DIFF_MAX_DIMENSION'),
+    modelTimeoutMs: toInt(parsed.MODEL_TIMEOUT_MS, 'MODEL_TIMEOUT_MS'),
     logLevel: parsed.LOG_LEVEL,
     rejectUnauthorized: parsed.REJECT_UNAUTHORIZED !== '0',
   };

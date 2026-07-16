@@ -14,7 +14,7 @@
  *
  * Usage from cc config:
  *   command: npx
- *   args: ['-y', 'github:spock-wen/vision-mcp-server']
+ *   args: ['-y', '@spock-wen/vision-mcp-server']
  *   env: { API_KEY: 'xxx:yyy' }
  */
 import { loadConfig } from './config.js';

@@ -45,8 +45,7 @@ export class KeyPool {
         const st = this.states.get(key)!;
         st.inFlight += 1;
         this.cursor = (idx + 1) % n;
-        const released = false;
-        let done = released;
+        let done = false;
         return {
           key,
           release: () => {

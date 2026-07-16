@@ -41,7 +41,7 @@ async function main(): Promise<void> {
             if (!res.headersSent) { res.statusCode = 500; res.end('Internal Server Error'); }
           });
         });
-        req.on('error', () => { if (!res.headersSent) { res.statusCode = 400; res.end('Bad Request'); } });
+        req.on('error', (err) => { if (!res.headersSent) { res.statusCode = 500; res.end('Internal Server Error'); } });
         return;
       }
       // GET / DELETE on /mcp — pass through without body
@@ -53,6 +53,11 @@ async function main(): Promise<void> {
     }
     res.statusCode = 404;
     res.end('Not Found');
+  });
+
+  httpServer.on('error', (err) => {
+    logger.error({ err: (err as Error).message }, 'http server error');
+    process.exit(1);
   });
 
   httpServer.listen(cfg.port, () => {

@@ -10,6 +10,7 @@ import { ConcurrencyLimiter } from './services/concurrency.js';
 import { registerAllTools } from './tools/index.js';
 import { buildTransport } from './transport/streamable-http.js';
 import type { ToolContext } from './tools/shared.js';
+import pkg from '../package.json' with { type: 'json' };
 
 export interface VisionMcpServer {
   /** Shared logger (services use the same one). */
@@ -28,7 +29,7 @@ export function createVisionServer(cfg: AppConfig): VisionMcpServer {
   const keyPool = new KeyPool({ keys: cfg.apiKeys, perKeyConcurrency: cfg.perKeyConcurrency, cooldownMs: cfg.keyCooldownMs }, logger);
   const model = new ModelClient(cfg, keyPool, logger);
   const processor = new ImageProcessor(
-    { maxSizeBytes: cfg.imageMaxSizeBytes, standardMaxDim: cfg.imageStandardMaxDim, ocrMaxDim: cfg.imageOcrMaxDim, diffMaxDim: 1536 },
+    { maxSizeBytes: cfg.imageMaxSizeBytes, standardMaxDim: cfg.imageStandardMaxDim, ocrMaxDim: cfg.imageOcrMaxDim, diffMaxDim: cfg.imageDiffMaxDim },
     logger,
   );
   const limiter = new ConcurrencyLimiter(cfg.maxConcurrency, logger);
@@ -36,7 +37,7 @@ export function createVisionServer(cfg: AppConfig): VisionMcpServer {
 
   // Shared factory: builds a fresh McpServer with all tools registered + a fresh transport, connected.
   const buildServer = async (): Promise<McpServer> => {
-    const server = new McpServer({ name: 'vision-mcp-server', version: '1.0.0' });
+    const server = new McpServer({ name: 'vision-mcp-server', version: pkg.version });
     registerAllTools(server, ctx);
     const transport = buildTransport(logger);
     await server.connect(transport);
@@ -45,7 +46,7 @@ export function createVisionServer(cfg: AppConfig): VisionMcpServer {
 
   const handleRequest = async (req: IncomingMessage, res: ServerResponse, parsedBody?: unknown) => {
     const transport = buildTransport(logger);
-    const server = new McpServer({ name: 'vision-mcp-server', version: '1.0.0' });
+    const server = new McpServer({ name: 'vision-mcp-server', version: pkg.version });
     registerAllTools(server, ctx);
     await server.connect(transport);
     try {
@@ -73,13 +74,13 @@ export async function createStdioServer(cfg: AppConfig): Promise<McpServer> {
   const keyPool = new KeyPool({ keys: cfg.apiKeys, perKeyConcurrency: cfg.perKeyConcurrency, cooldownMs: cfg.keyCooldownMs }, logger);
   const model = new ModelClient(cfg, keyPool, logger);
   const processor = new ImageProcessor(
-    { maxSizeBytes: cfg.imageMaxSizeBytes, standardMaxDim: cfg.imageStandardMaxDim, ocrMaxDim: cfg.imageOcrMaxDim, diffMaxDim: 1536 },
+    { maxSizeBytes: cfg.imageMaxSizeBytes, standardMaxDim: cfg.imageStandardMaxDim, ocrMaxDim: cfg.imageOcrMaxDim, diffMaxDim: cfg.imageDiffMaxDim },
     logger,
   );
   const limiter = new ConcurrencyLimiter(cfg.maxConcurrency, logger);
   const ctx: ToolContext = { processor, model, limiter };
 
-  const server = new McpServer({ name: 'vision-mcp-server', version: '1.0.0' });
+  const server = new McpServer({ name: 'vision-mcp-server', version: pkg.version });
   registerAllTools(server, ctx);
   await server.connect(new StdioServerTransport());
   return server;

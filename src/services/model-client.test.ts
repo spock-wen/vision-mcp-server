@@ -11,7 +11,7 @@ const log = createLogger('silent');
 const baseCfg: AppConfig = {
   port: 3000, apiKeys: ['a', 'b', 'c'], apiBaseUrl: 'https://example.test/anthropic', modelId: 'xopkimik26',
   maxConcurrency: 100, perKeyConcurrency: 20, maxRetries: 3, keyCooldownMs: 60_000, retryDelayMs: 1, maxRetryDelayMs: 10,
-  imageMaxSizeBytes: 10 * 1024 * 1024, imageStandardMaxDim: 2048, imageOcrMaxDim: 4096, logLevel: 'silent', rejectUnauthorized: true,
+  imageMaxSizeBytes: 10 * 1024 * 1024, imageStandardMaxDim: 2048, imageOcrMaxDim: 4096, imageDiffMaxDim: 1536, modelTimeoutMs: 30000, logLevel: 'silent', rejectUnauthorized: true,
 };
 const img: ProcessedImage = { base64: 'AAAA', mediaType: 'image/jpeg', width: 10, height: 10, bytes: 4 };
 

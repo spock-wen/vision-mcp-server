@@ -20,6 +20,8 @@ test('loadConfig applies defaults', () => {
   assert.equal(c.imageMaxSizeBytes, 10 * 1024 * 1024);
   assert.equal(c.imageStandardMaxDim, 2048);
   assert.equal(c.imageOcrMaxDim, 4096);
+  assert.equal(c.imageDiffMaxDim, 1536);
+  assert.equal(c.modelTimeoutMs, 30000);
   assert.equal(c.logLevel, 'info');
 });
 
