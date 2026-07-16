@@ -19,6 +19,9 @@ const EnvSchema = z.object({
   IMAGE_MAX_DIMENSION: z.string().default('2048'),
   IMAGE_OCR_MAX_DIMENSION: z.string().default('4096'),
   LOG_LEVEL: z.string().default('info'),
+  // Set to "0" to skip TLS certificate verification for model requests — use only for
+  // intranet endpoints with self-signed certs (e.g. company gateways). Defaults to verify.
+  REJECT_UNAUTHORIZED: z.string().default('1'),
 });
 
 export interface AppConfig {
@@ -36,6 +39,7 @@ export interface AppConfig {
   imageStandardMaxDim: number;
   imageOcrMaxDim: number;
   logLevel: string;
+  rejectUnauthorized: boolean;
 }
 
 function toInt(raw: string, field: string): number {
@@ -75,5 +79,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     imageStandardMaxDim: toInt(parsed.IMAGE_MAX_DIMENSION, 'IMAGE_MAX_DIMENSION'),
     imageOcrMaxDim: toInt(parsed.IMAGE_OCR_MAX_DIMENSION, 'IMAGE_OCR_MAX_DIMENSION'),
     logLevel: parsed.LOG_LEVEL,
+    rejectUnauthorized: parsed.REJECT_UNAUTHORIZED !== '0',
   };
 }

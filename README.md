@@ -78,6 +78,8 @@ claude mcp add vision-mcp-server -- npx -y github:spock-wen/vision-mcp-server
 
 > 如果不填 `API_BASE_URL` / `MODEL_ID`，会用上面的默认值（讯飞 MaaS + `xopkimik26`）；但 `API_KEY` **必填**，否则启动报错。
 
+> **内网自签证书端点**：若 `API_BASE_URL` 指向使用自签证书的内网网关（如公司内部模型服务），需加 `REJECT_UNAUTHORIZED: "0"` 关闭 TLS 校验，否则连接失败。仅在受信任的内网环境使用。
+
 用法：在 cc 对话里直接给本地图片路径，例如「分析 /Users/me/x.png」，cc 会把路径传给工具，工具本地读取。
 
 ### 远程 HTTP 模式（可选）

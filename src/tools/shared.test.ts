@@ -14,7 +14,7 @@ const log = createLogger('silent');
 const baseCfg: AppConfig = {
   port: 3000, apiKeys: ['a'], apiBaseUrl: 'https://example.test/anthropic', modelId: 'xopkimik26',
   maxConcurrency: 100, perKeyConcurrency: 20, maxRetries: 1, keyCooldownMs: 60_000, retryDelayMs: 1, maxRetryDelayMs: 10,
-  imageMaxSizeBytes: 10 * 1024 * 1024, imageStandardMaxDim: 2048, imageOcrMaxDim: 4096, logLevel: 'silent',
+  imageMaxSizeBytes: 10 * 1024 * 1024, imageStandardMaxDim: 2048, imageOcrMaxDim: 4096, logLevel: 'silent', rejectUnauthorized: true,
 };
 
 async function whitePng(): Promise<{ base64: string; mimeType: string }> {

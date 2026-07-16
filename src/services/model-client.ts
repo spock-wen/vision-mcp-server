@@ -32,7 +32,15 @@ export class ModelClient {
     private readonly keyPool: KeyPool,
     private readonly logger: Logger,
     private readonly fetchImpl: typeof fetch = fetch,
-  ) {}
+  ) {
+    // Allow intranet self-signed endpoints (e.g. company gateways) when explicitly opted in.
+    // NODE_TLS_REJECT_UNAUTHORIZED is Node's process-wide switch; we set it only when the
+    // user opted in via REJECT_UNAUTHORIZED=0, and only model requests (this client) use it.
+    if (!cfg.rejectUnauthorized) {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      logger.warn('TLS 证书校验已关闭（REJECT_UNAUTHORIZED=0）—— 仅适用于内网自签端点');
+    }
+  }
 
   async complete(req: CompleteRequest): Promise<CompleteResult> {
     return this.completeMulti({ system: req.system, userText: req.userText, images: [req.image], maxTokens: req.maxTokens });

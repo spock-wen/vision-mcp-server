@@ -47,3 +47,13 @@ test('loadConfig merges API_KEY and API_KEYS when both set', () => {
   const c = loadConfig({ API_KEY: 'solo', API_KEYS: 'a,b' });
   assert.deepEqual(c.apiKeys, ['solo', 'a', 'b']);
 });
+
+test('loadConfig defaults rejectUnauthorized=true', () => {
+  const c = loadConfig({ API_KEY: 'k' });
+  assert.equal(c.rejectUnauthorized, true);
+});
+
+test('loadConfig sets rejectUnauthorized=false when REJECT_UNAUTHORIZED=0', () => {
+  const c = loadConfig({ API_KEY: 'k', REJECT_UNAUTHORIZED: '0' });
+  assert.equal(c.rejectUnauthorized, false);
+});
