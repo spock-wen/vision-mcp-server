@@ -1,6 +1,8 @@
 export type ImageInput = {
-  /** base64-encoded image data (required) */
-  base64: string;
+  /** local file path — preferred for local/stdio use (keeps image bytes out of the caller's context) */
+  path?: string;
+  /** base64-encoded image data (mutually exclusive with path) */
+  base64?: string;
   /** optional MIME hint; auto-detected when omitted */
   mimeType?: string;
 };

@@ -37,3 +37,13 @@ test('loadConfig throws ConfigError when API_KEYS missing', () => {
 test('loadConfig throws ConfigError when API_KEYS empty', () => {
   assert.throws(() => loadConfig({ API_KEYS: ' , ' }), ConfigError);
 });
+
+test('loadConfig accepts singular API_KEY (local/stdio form)', () => {
+  const c = loadConfig({ API_KEY: 'solo-key' });
+  assert.deepEqual(c.apiKeys, ['solo-key']);
+});
+
+test('loadConfig merges API_KEY and API_KEYS when both set', () => {
+  const c = loadConfig({ API_KEY: 'solo', API_KEYS: 'a,b' });
+  assert.deepEqual(c.apiKeys, ['solo', 'a', 'b']);
+});

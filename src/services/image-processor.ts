@@ -1,7 +1,23 @@
 import sharp from 'sharp';
+import fs from 'node:fs/promises';
+import { isAbsolute, resolve } from 'node:path';
 import type { Logger } from '../utils/logger.js';
 import { UnsupportedImageFormatError, ImageTooLargeError } from '../utils/errors.js';
 import type { ImageInput, ProcessMode, ProcessedImage } from '../types.js';
+
+/** Resolve an ImageInput to raw bytes: either a local file path or inline base64. */
+async function resolveImageBytes(input: ImageInput): Promise<Buffer> {
+  if (input.path) {
+    const p = isAbsolute(input.path) ? input.path : resolve(input.path);
+    try {
+      return await fs.readFile(p);
+    } catch {
+      throw new UnsupportedImageFormatError(`无法读取图片文件: ${input.path}`);
+    }
+  }
+  if (input.base64) return Buffer.from(input.base64, 'base64');
+  throw new UnsupportedImageFormatError('需要提供 image.path 或 image.base64');
+}
 
 export interface ImageProcessorConfig {
   maxSizeBytes: number;
@@ -33,7 +49,7 @@ export class ImageProcessor {
   constructor(private readonly cfg: ImageProcessorConfig, private readonly logger: Logger) {}
 
   async process(input: ImageInput, mode: ProcessMode): Promise<ProcessedImage> {
-    const decoded = Buffer.from(input.base64, 'base64');
+    const decoded = await resolveImageBytes(input);
 
     if (decoded.length > this.cfg.maxSizeBytes) {
       throw new ImageTooLargeError(`图片过大，上限 ${(this.cfg.maxSizeBytes / 1024 / 1024).toFixed(0)}MB`);

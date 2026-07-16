@@ -59,3 +59,28 @@ export function createVisionServer(cfg: AppConfig): VisionMcpServer {
 
   return { logger, buildServer, handleRequest, keyPool, limiter };
 }
+
+/**
+ * Build a vision McpServer connected to a StdioServerTransport (local MCP use).
+ * Shares the same services/tools as the HTTP server, but talks over stdin/stdout
+ * so cc (or any MCP client) can spawn it as a local process — letting tools read
+ * local image paths directly instead of receiving base64 over the wire.
+ */
+export async function createStdioServer(cfg: AppConfig): Promise<McpServer> {
+  const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
+  const logger = createLogger(cfg.logLevel);
+
+  const keyPool = new KeyPool({ keys: cfg.apiKeys, perKeyConcurrency: cfg.perKeyConcurrency, cooldownMs: cfg.keyCooldownMs }, logger);
+  const model = new ModelClient(cfg, keyPool, logger);
+  const processor = new ImageProcessor(
+    { maxSizeBytes: cfg.imageMaxSizeBytes, standardMaxDim: cfg.imageStandardMaxDim, ocrMaxDim: cfg.imageOcrMaxDim, diffMaxDim: 1536 },
+    logger,
+  );
+  const limiter = new ConcurrencyLimiter(cfg.maxConcurrency, logger);
+  const ctx: ToolContext = { processor, model, limiter };
+
+  const server = new McpServer({ name: 'vision-mcp-server', version: '1.0.0' });
+  registerAllTools(server, ctx);
+  await server.connect(new StdioServerTransport());
+  return server;
+}

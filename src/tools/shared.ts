@@ -5,9 +5,10 @@ import type { ConcurrencyLimiter } from '../services/concurrency.js';
 import type { ImageInput, ProcessMode } from '../types.js';
 
 export const ImageInputSchema = z.object({
-  base64: z.string().min(1),
+  path: z.string().min(1).optional().describe('本地图片文件路径（推荐，本机使用时图片不进入调用方上下文）'),
+  base64: z.string().min(1).optional().describe('base64 编码的图片（与 path 二选一）'),
   mimeType: z.string().optional(),
-});
+}).refine((v) => Boolean(v.path) || Boolean(v.base64), { message: '必须提供 path 或 base64 之一' });
 
 export interface ToolContext {
   processor: ImageProcessor;

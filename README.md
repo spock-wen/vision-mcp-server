@@ -46,6 +46,44 @@ docker compose up -d
 
 ## Connect a client
 
+### 本地 stdio 模式（推荐）
+
+适合个人/团队本地使用。cc 直接 spawn 本地进程，工具读本地文件路径 —— **图片不进入对话上下文**，零 base64 开销。
+
+每人需要自己配 **三个环境变量**：`API_KEY`（讯飞密钥）、`API_BASE_URL`（模型 API 地址）、`MODEL_ID`（模型 ID）。
+
+在 cc 里加：
+
+```bash
+claude mcp add vision-mcp-server -- npx -y github:spock-wen/vision-mcp-server
+```
+
+然后编辑 `~/.claude.json` 补上三个环境变量（下面是示例值，按你的实际情况替换）：
+
+```json
+{
+  "mcpServers": {
+    "vision-mcp-server": {
+      "command": "npx",
+      "args": ["-y", "github:spock-wen/vision-mcp-server"],
+      "env": {
+        "API_KEY": "你的讯飞密钥整串（格式 id:secret）",
+        "API_BASE_URL": "https://maas-coding-api.cn-huabei-1.xf-yun.com/anthropic",
+        "MODEL_ID": "xopkimik26"
+      }
+    }
+  }
+}
+```
+
+> 如果不填 `API_BASE_URL` / `MODEL_ID`，会用上面的默认值（讯飞 MaaS + `xopkimik26`）；但 `API_KEY` **必填**，否则启动报错。
+
+用法：在 cc 对话里直接给本地图片路径，例如「分析 /Users/me/x.png」，cc 会把路径传给工具，工具本地读取。
+
+### 远程 HTTP 模式（可选）
+
+适合集中部署、多设备共享。需先按 Quick start 起服务。
+
 **Claude Code:**
 ```bash
 claude mcp add -s user vision-mcp-server --transport http http://localhost:3000/mcp
