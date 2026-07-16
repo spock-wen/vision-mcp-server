@@ -1,0 +1,13 @@
+# Source and dev files — only build/ goes to npm
+src/
+.omc/
+test/
+
+# Source maps — not needed in production
+build/**/*.js.map
+
+# Dev config
+.env
+.env.local
+tsconfig.json
+tsconfig.build.json

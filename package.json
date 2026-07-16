@@ -1,19 +1,51 @@
 {
-  "name": "vision-mcp-server",
+  "name": "@spock-wen/vision-mcp-server",
   "version": "1.0.0",
-  "description": "Vision MCP server (local stdio + remote HTTP) exposing 7 vision tools over the 讯飞 MaaS Anthropic-compatible model API",
+  "description": "MCP server exposing 7 vision tools (analysis, UI→code, OCR, error diagnosis, diagram, data-viz, diff) — works with any Anthropic-Messages-compatible vision model",
   "type": "module",
   "main": "build/index.js",
   "bin": {
     "vision-mcp": "build/cli.js"
   },
+  "files": [
+    "build/**/*.js",
+    "commands/",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "start": "node build/index.js",
     "stdio": "node build/cli.js",
     "dev": "tsx watch src/index.ts",
-    "test": "node --import tsx --test \"src/**/*.test.ts\""
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spock-wen/vision-mcp-server.git"
+  },
+  "homepage": "https://github.com/spock-wen/vision-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/spock-wen/vision-mcp-server/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "vision",
+    "ocr",
+    "ui-to-code",
+    "data-viz",
+    "anthropic",
+    "claude",
+    "screenshot",
+    "image-analysis"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.26.0",

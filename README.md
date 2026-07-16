@@ -40,7 +40,7 @@ Add to your Claude Code MCP config (`~/.claude.json`):
   "mcpServers": {
     "vision-mcp-server": {
       "command": "npx",
-      "args": ["-y", "github:spock-wen/vision-mcp-server"],
+      "args": ["-y", "@spock-wen/vision-mcp-server"],
       "env": {
         "API_KEY": "your-model-api-key",
         "API_BASE_URL": "https://your-model-endpoint.example.com",
@@ -55,7 +55,7 @@ Then in Claude Code: *"Analyze /Users/me/screenshot.png"* — the path is passed
 
 Or via CLI:
 ```bash
-claude mcp add vision-mcp-server -- npx -y github:spock-wen/vision-mcp-server
+claude mcp add vision-mcp-server -- npx -y @spock-wen/vision-mcp-server
 ```
 
 ### Option B — Remote HTTP mode (self-host, multi-device)
@@ -111,7 +111,7 @@ The repo ships **7 slash commands** (files under `commands/`) that let you **exp
 
 Each command automatically extracts the image path from your input and maps it to the right tool parameter (`image.path`, `image_before`/`image_after`, etc.), so you don't need to worry about parameter names.
 
-> **Tip:** If you cloned the repo locally and added it as a local MCP server (e.g. `command: "node", args: ["dist/index.js"]`), the `commands/` folder is already available — just type the slash command. If you use `npx` to run the server, copy the `commands/` folder into your project root or workspace so Claude Code can discover them.
+> **Tip:** If you cloned the repo locally and added it as a local MCP server (e.g. `command: "node", args: ["build/index.js"]`), the `commands/` folder is already available — just type the slash command. If you use `npx` to run the server, copy the `commands/` folder into your project root or workspace so Claude Code can discover them.
 
 ## Configuration
 
