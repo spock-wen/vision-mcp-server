@@ -79,6 +79,40 @@ echo "API_KEYS=key1,key2" > .env
 docker compose up -d
 ```
 
+## Using the tools in Claude Code
+
+You need to **specify the tool name** in your message for the model to call the right tool. Paste a **local image path** alongside the tool name; the server reads the file **locally, so image bytes never enter your conversation** (no token bloat, no slowdowns).
+
+> Always prefer a **local `path`** (`image.path`). Only `image.base64` enters your context — use it just when no local file exists.
+
+| Tool | Say this in Claude Code | Key params |
+|---|---|---|
+| `image_analysis` | *"Use `image_analysis` to analyze /Users/me/pic.jpg — what's in it?"* | `question` |
+| `ui_to_artifact` | *"Use `ui_to_artifact` to turn /Users/me/login.png into React + Tailwind code"* | `task`: `code` \| `prompt` \| `design-spec` \| `description` |
+| `diagnose_error_screenshot` | *"Use `diagnose_error_screenshot` to diagnose /Users/me/err.png"* | `context` (optional) |
+| `understand_technical_diagram` | *"Use `understand_technical_diagram` to explain /Users/me/arch.png"* | `diagram_type` (optional) |
+| `analyze_data_visualization` | *"Use `analyze_data_visualization` to summarize trends in /Users/me/chart.png"* | `analysis_focus` (optional) |
+| `extract_text_from_screenshot` | *"Use `extract_text_from_screenshot` to OCR /Users/me/receipt.png"* | `language` (optional) |
+| `ui_diff_check` | *"Use `ui_diff_check` to compare /Users/me/v1.png and /Users/me/v2.png"* | two images + `focus` (optional) |
+
+### Slash Commands — explicitly pick a tool
+
+The repo ships **7 slash commands** (files under `commands/`) that let you **explicitly tell Claude which MCP tool to call** — no ambiguity, no relying on the model to guess. Install the repo locally (or copy the `commands/` folder into your project), then type the command with an image path:
+
+| Command | Tool called | Example |
+|---|---|---|
+| `/vision-analyze` | `image_analysis` | `/vision-analyze What's in /Users/me/pic.jpg` |
+| `/vision-ui2code` | `ui_to_artifact` | `/vision-ui2code /Users/me/login.png` |
+| `/vision-err` | `diagnose_error_screenshot` | `/vision-err /Users/me/err.png` |
+| `/vision-diagram` | `understand_technical_diagram` | `/vision-diagram /Users/me/arch.png` |
+| `/vision-dataviz` | `analyze_data_visualization` | `/vision-dataviz /Users/me/chart.png` |
+| `/vision-ocr` | `extract_text_from_screenshot` | `/vision-ocr /Users/me/receipt.png` |
+| `/vision-diff` | `ui_diff_check` | `/vision-diff /Users/me/v1.png /Users/me/v2.png` |
+
+Each command automatically extracts the image path from your input and maps it to the right tool parameter (`image.path`, `image_before`/`image_after`, etc.), so you don't need to worry about parameter names.
+
+> **Tip:** If you cloned the repo locally and added it as a local MCP server (e.g. `command: "node", args: ["dist/index.js"]`), the `commands/` folder is already available — just type the slash command. If you use `npx` to run the server, copy the `commands/` folder into your project root or workspace so Claude Code can discover them.
+
 ## Configuration
 
 All config is via environment variables. **Three are about your model** — the rest are tuning knobs with sensible defaults.

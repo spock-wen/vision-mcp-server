@@ -79,6 +79,40 @@ echo "API_KEYS=key1,key2" > .env
 docker compose up -d
 ```
 
+## 在 Claude Code 中使用工具
+
+你需要在消息中**指定工具名**，模型才会调用正确的工具。贴上**本地图片路径**并写明工具名；服务器在本地读取文件，图片字节**完全不进入你的对话上下文**（不占 token、不卡顿）。
+
+> 务必优先使用**本地 `path`**（`image.path`）。只有 `image.base64` 会进入上下文——仅在本地没有文件时才用。
+
+| 工具 | 在 Claude Code 里这样说 | 关键参数 |
+|---|---|---|
+| `image_analysis` | *"使用 `image_analysis` 工具分析下 /Users/me/pic.jpg 里有什么"* | `question` |
+| `ui_to_artifact` | *"使用 `ui_to_artifact` 工具把 /Users/me/login.png 转成 React + Tailwind 代码"* | `task`：`code` \| `prompt` \| `design-spec` \| `description` |
+| `diagnose_error_screenshot` | *"使用 `diagnose_error_screenshot` 工具诊断这张报错截图 /Users/me/err.png"* | `context`（可选） |
+| `understand_technical_diagram` | *"使用 `understand_technical_diagram` 工具解读下这张架构图 /Users/me/arch.png"* | `diagram_type`（可选） |
+| `analyze_data_visualization` | *"使用 `analyze_data_visualization` 工具总结下 /Users/me/chart.png 的数据趋势"* | `analysis_focus`（可选） |
+| `extract_text_from_screenshot` | *"使用 `extract_text_from_screenshot` 工具识别下 /Users/me/receipt.png 里的文字"* | `language`（可选） |
+| `ui_diff_check` | *"使用 `ui_diff_check` 工具对比 /Users/me/v1.png 和 /Users/me/v2.png，哪里变了？"* | 两张图 + `focus`（可选） |
+
+### Slash 命令——显式指定工具
+
+本项目自带 **7 个 Slash 命令**（`commands/` 目录下的 `.md` 文件），让你**直接告诉 Claude 调用哪个 MCP 工具**——无需依赖模型猜测，零歧义。本地安装本项目（或将 `commands/` 文件夹复制到你的项目），然后输入命令加图片路径即可：
+
+| 命令 | 调用的工具 | 示例 |
+|---|---|---|
+| `/vision-analyze` | `image_analysis` | `/vision-analyze /Users/me/pic.jpg 里有什么` |
+| `/vision-ui2code` | `ui_to_artifact` | `/vision-ui2code /Users/me/login.png` |
+| `/vision-err` | `diagnose_error_screenshot` | `/vision-err /Users/me/err.png` |
+| `/vision-diagram` | `understand_technical_diagram` | `/vision-diagram /Users/me/arch.png` |
+| `/vision-dataviz` | `analyze_data_visualization` | `/vision-dataviz /Users/me/chart.png` |
+| `/vision-ocr` | `extract_text_from_screenshot` | `/vision-ocr /Users/me/receipt.png` |
+| `/vision-diff` | `ui_diff_check` | `/vision-diff /Users/me/v1.png /Users/me/v2.png` |
+
+每条命令会自动从你的输入中提取图片路径，映射到对应工具参数（`image.path`、`image_before`/`image_after` 等），你无需关心参数名。
+
+> **提示：** 如果你克隆了仓库并以本地 MCP 服务器方式运行（如 `command: "node", args: ["dist/index.js"]`），`commands/` 目录已就绪——直接输入 slash 命令即可。如果你用 `npx` 运行服务器，需将 `commands/` 文件夹复制到你的项目根目录或工作区，Claude Code 才能发现这些命令。
+
 ## 配置
 
 全部通过环境变量配置。**前三个与你的模型相关**——其余均为带合理默认值的调参项。
